@@ -36,5 +36,7 @@ namespace Native.Csharp.App
         /// 拓展配置，
         /// </summary>
         public static Config Config { get; set; }
+
+        public static SQLiteHelper SQLiteHelper { get; set; }
     }
 }

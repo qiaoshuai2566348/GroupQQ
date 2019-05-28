@@ -124,7 +124,7 @@
     <Compile Include="Repair\Helper\AssemblyHelper.cs" />
     <Compile Include="Repair\Helper\ReflectionHelper.cs" />
     <Compile Include="Repair\ModuleInitializer.cs" />
-    <Compile Include="App\SQLiteDB.cs" />
+    <Compile Include="App\SQLiteHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.json">
