@@ -93,6 +93,7 @@ namespace Native.Csharp.App.Event
             commandListDic.Add(8, "删除发送群");
             commandListDic.Add(9, "查询发送群");
             commandListDic.Add(10,"指令");
+            commandListDic.Add(11,"指令");
 
             handlFriendMessageResult = new StringBuilder();
             if (e.Msg == "开启计时器")
