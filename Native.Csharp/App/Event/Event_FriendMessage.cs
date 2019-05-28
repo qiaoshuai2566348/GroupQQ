@@ -35,11 +35,12 @@ namespace Native.Csharp.App.Event
 		/// <param name="e">事件的附加参数</param>
 		public void ReceiveFriendAddRequest (object sender, FriendAddRequestEventArgs e)
 		{
-			// 本子程序会在酷Q【线程】中被调用，请注意使用对象等需要初始化(CoInitialize,CoUninitialize)。
-			// 这里处理消息
+            // 本子程序会在酷Q【线程】中被调用，请注意使用对象等需要初始化(CoInitialize,CoUninitialize)。
+            // 这里处理消息
 
-
-
+            Common.CqApi.SetFriendAddRequest("机器人添加", Sdk.Cqp.Enum.ResponseType.PASS, "机器人添加");
+            e.Handled = true;
+            return;
 			e.Handled = false;   // 关于返回说明, 请参见 "Event_ReceiveMessage.ReceiveFriendMessage" 方法
 		}
 
@@ -58,9 +59,15 @@ namespace Native.Csharp.App.Event
             // 本子程序会在酷Q【线程】中被调用，请注意使用对象等需要初始化(CoInitialize,CoUninitialize)。
             // 这里处理消息
 
-            if(e.FromQQ == Common.ManagerQQ)
+            bool isManager = false;
+            foreach (var item in Common.Config.ManagersQQ)
             {
-                ManagerXmRobat(sender,e);
+                if (item == e.FromQQ)
+                    isManager = true;
+            }
+            if (!isManager)
+            {
+                ManagerXmRobat(sender, e);
                 return;
             }
             e.Handled = false;
@@ -73,7 +80,6 @@ namespace Native.Csharp.App.Event
         #region Export
 
         private List<string> commandList = new List<string>();
-        private Dictionary<int, string> commandListDic = new Dictionary<int, string>();
 
         /// <summary>
         /// 735487435 管理xm机器人
@@ -82,20 +88,8 @@ namespace Native.Csharp.App.Event
         /// <param name="e"></param>
         private void ManagerXmRobat(object sender,PrivateMessageEventArgs e)
         {
-            commandListDic.Add(0, "开启计时器");
-            commandListDic.Add(1, "结束计时器");
-            commandListDic.Add(2, "设置群发消息");
-            commandListDic.Add(3, "设置计时器间隔");
-            commandListDic.Add(4, "获取群列表");
-            commandListDic.Add(5, "获取群成员列表");
-            commandListDic.Add(6, "获取群成员");
-            commandListDic.Add(7, "添加发送群");
-            commandListDic.Add(8, "删除发送群");
-            commandListDic.Add(9, "查询发送群");
-            commandListDic.Add(10,"指令");
-            commandListDic.Add(11,"指令");
-
             handlFriendMessageResult = new StringBuilder();
+
             if (e.Msg == "开启计时器")
             {
                 isStop = false;
@@ -108,9 +102,9 @@ namespace Native.Csharp.App.Event
             else if (e.Msg.Contains("设置群发消息"))
             {
                 string splitStr = ":";
-                Common.SendGroupMsgContent = e.Msg.Split(splitStr.ToCharArray())[0];
+                Common.Config.SendGroupMsgContent = e.Msg.Split(splitStr.ToCharArray())[0];
                 handlFriendMessageResult.Append("设置群发消息成功，当前群发消息为【");
-                handlFriendMessageResult.Append(Common.SendGroupMsgContent);
+                handlFriendMessageResult.Append(Common.Config.SendGroupMsgContent);
                 handlFriendMessageResult.Append("】");
             }
 
@@ -130,9 +124,9 @@ namespace Native.Csharp.App.Event
                 }
                 else
                 {
-                    Common.SendGroupMsgDelay = time;
+                    Common.Config.SendGroupMsgDelay = time;
                     handlFriendMessageResult.Append("设置发送时间成功，当前时间为");
-                    handlFriendMessageResult.Append(Common.SendGroupMsgDelay);
+                    handlFriendMessageResult.Append(Common.Config.SendGroupMsgDelay);
                 }
             }else if (e.Msg == "获取群列表")
             {
@@ -154,7 +148,28 @@ namespace Native.Csharp.App.Event
                 }
             }else if (e.Msg.Contains("获取群成员"))
             {
-
+                int groupId = 0;
+                List<Sdk.Cqp.Model.GroupMember> groupMembers = new List<Sdk.Cqp.Model.GroupMember>();
+                int result =Common.CqApi.GetMemberList(groupId, out groupMembers);
+                if(result == 0)
+                {
+                    int count = 0;
+                    foreach (var item in groupMembers)
+                    {
+                        if (int.Parse(item.Level) < 15)
+                            break;
+                        handlFriendMessageResult.Append(item.QQId);
+                        if(count <= groupMembers.Count)
+                            handlFriendMessageResult.Append(",");
+                        count++;
+                    }
+                }
+                else
+                {
+                    handlFriendMessageResult.Append("获取群成员列表失败:");
+                    handlFriendMessageResult.Append(groupId);
+                    return;
+                }
             }
             else if (e.Msg.Contains("添加发送群"))
             {
@@ -163,7 +178,7 @@ namespace Native.Csharp.App.Event
                 {
                     group = long.Parse(e.Msg.Split(':')[1]);
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
                 }
                 if (group == 999)

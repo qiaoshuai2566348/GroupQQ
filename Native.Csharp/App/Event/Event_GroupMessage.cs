@@ -145,7 +145,6 @@ namespace Native.Csharp.App.Event
 			// 这里处理消息
 
 
-
 			e.Handled = false;  // 关于返回说明, 请参见 "Event_FriendMessage.ReceiveFriendMessage" 方法
 		}
 

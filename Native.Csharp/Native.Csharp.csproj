@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
     <ProjectGuid>{8BC2C861-D30C-425B-98A7-812792D2017D}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
@@ -59,7 +59,6 @@
     <Reference Include="DllExport, PublicKeyToken=8337224c9ad9e356">
       <HintPath>$(SolutionDir)packages\DllExport.1.6.1\gcache\metalib\$(DllExportNamespace)\$(DllExportMetaLibName)</HintPath>
       <Private>False</Private>
-      <SpecificVersion>False</SpecificVersion>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
@@ -85,6 +84,7 @@
     <Reference Include="Unity.ServiceLocation, Version=2.1.2.0, Culture=neutral, PublicKeyToken=489b6accfaf20ef0, processorArchitecture=MSIL">
       <HintPath>..\packages\Unity.5.8.6\lib\net40\Unity.ServiceLocation.dll</HintPath>
     </Reference>
+    <Reference Include="Mono.Data.Sqlite" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App\Common.cs" />
@@ -124,6 +124,7 @@
     <Compile Include="Repair\Helper\AssemblyHelper.cs" />
     <Compile Include="Repair\Helper\ReflectionHelper.cs" />
     <Compile Include="Repair\ModuleInitializer.cs" />
+    <Compile Include="App\SQLiteDB.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.json">

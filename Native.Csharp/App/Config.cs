@@ -14,8 +14,10 @@ namespace Native.Csharp.App
 
         #region 私有变量
         private List<long> m_canSendGroup = new List<long>();
-        private long m_managerQQ = 735487435;
         private List<long> m_managersQQ = new List<long>();
+        private long m_sendGroupMsgDelay = 5000;
+        private string m_sendGroupMsgContent = "群消息定时发送测试";
+
 
         public List<long> CanSendGroup
         {
@@ -27,19 +29,6 @@ namespace Native.Csharp.App
             set
             {
                 m_canSendGroup = value;
-            }
-        }
-
-        public long ManagerQQ
-        {
-            get
-            {
-                return m_managerQQ;
-            }
-
-            set
-            {
-                m_managerQQ = value;
             }
         }
 
@@ -55,6 +44,9 @@ namespace Native.Csharp.App
                 m_managersQQ = value;
             }
         }
+
+        public long SendGroupMsgDelay { get => m_sendGroupMsgDelay; set => m_sendGroupMsgDelay = value; }
+        public string SendGroupMsgContent { get => m_sendGroupMsgContent; set => m_sendGroupMsgContent = value; }
         #endregion
 
         Config()
