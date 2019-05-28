@@ -130,9 +130,10 @@ namespace Native.Csharp.App.Event
                         id++;
                         handlFriendMessageResult.Append(id);
                         handlFriendMessageResult.Append(":群号：");
-                        handlFriendMessageResult.Append(":群名称：");
                         handlFriendMessageResult.Append(item.Id);
-                        handlFriendMessageResult.Append("/r/n");
+                        handlFriendMessageResult.Append(":群名称：");
+                        handlFriendMessageResult.Append(item.Name);
+                        handlFriendMessageResult.Append("\r\n");
                     }
                 }
             }

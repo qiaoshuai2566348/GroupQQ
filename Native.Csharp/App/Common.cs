@@ -37,7 +37,7 @@ namespace Native.Csharp.App
         /// </summary>
         public static Config Config { get; set; }
 
-        public static long ManagerQQ = 735487435;
+        public static long ManagerQQ = 2947163687;
         public static long SendGroupMsgDelay = 50000;
         public static string SendGroupMsgContent = "群消息定时发送测试";
     }
