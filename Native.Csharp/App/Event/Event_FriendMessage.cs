@@ -72,6 +72,9 @@ namespace Native.Csharp.App.Event
 
         #region Export
 
+        private List<string> commandList = new List<string>();
+        private Dictionary<int, string> commandListDic = new Dictionary<int, string>();
+
         /// <summary>
         /// 735487435 管理xm机器人
         /// </summary>
@@ -79,6 +82,18 @@ namespace Native.Csharp.App.Event
         /// <param name="e"></param>
         private void ManagerXmRobat(object sender,PrivateMessageEventArgs e)
         {
+            commandListDic.Add(0, "开启计时器");
+            commandListDic.Add(1, "结束计时器");
+            commandListDic.Add(2, "设置群发消息");
+            commandListDic.Add(3, "设置计时器间隔");
+            commandListDic.Add(4, "获取群列表");
+            commandListDic.Add(5, "获取群成员列表");
+            commandListDic.Add(6, "获取群成员");
+            commandListDic.Add(7, "添加发送群");
+            commandListDic.Add(8, "删除发送群");
+            commandListDic.Add(9, "查询发送群");
+            commandListDic.Add(10,"指令");
+
             handlFriendMessageResult = new StringBuilder();
             if (e.Msg == "开启计时器")
             {
@@ -136,6 +151,9 @@ namespace Native.Csharp.App.Event
                         handlFriendMessageResult.Append("\r\n");
                     }
                 }
+            }else if (e.Msg.Contains("获取群成员"))
+            {
+
             }
             else if (e.Msg.Contains("添加发送群"))
             {
