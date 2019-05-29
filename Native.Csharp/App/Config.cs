@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Native.Csharp.Sdk.Cqp.Model;
 
 namespace Native.Csharp.App
 {
@@ -15,7 +16,7 @@ namespace Native.Csharp.App
         #region 私有变量
         private List<long> m_canSendGroup = new List<long>();
         private List<long> m_managersQQ = new List<long>();
-        private long m_sendGroupMsgDelay = 5000;
+        private int m_sendGroupMsgDelay = 5000;
         private string m_sendGroupMsgContent = "群消息定时发送测试";
 
         private const long defaultManagerQQ = 735487435;
@@ -30,6 +31,7 @@ namespace Native.Csharp.App
         /// </summary>
         private Dictionary<long, string> m_sendGroupMsgDic = new Dictionary<long, string>();
 
+        private List<long> m_managerGroups = new List<long>();
 
         public List<long> CanSendGroup
         {
@@ -57,7 +59,7 @@ namespace Native.Csharp.App
             }
         }
 
-        public long SendGroupMsgDelay
+        public int SendGroupMsgDelay
         {
             get
             {
@@ -85,36 +87,48 @@ namespace Native.Csharp.App
 
         public Dictionary<long, List<long>> AlreadySendQQ
         {
-            get
-            {
-                return m_alreadySendQQ;
-            }
-
-            set
-            {
-                m_alreadySendQQ = value;
-            }
+            get { return m_alreadySendQQ; }
+            set { m_alreadySendQQ = value; }
         }
 
-        public Dictionary<long, string> SendContentDic
+        public Dictionary<long, string> SendGroupMsgDic
         {
-            get
-            {
-                return m_sendGroupMsgDic;
-            }
-
-            set
-            {
-                m_sendGroupMsgDic = value;
-            }
+            get { return m_sendGroupMsgDic; }
+            set { m_sendGroupMsgDic = value; }
         }
+
         #endregion
         public Config()
         {
             m_managersQQ.Add(735487435);
             m_managersQQ.Add(2947163687);
 
-            m_sendGroupMsgDic.Add(416554225, "健身健美交流群 测试1");
+            SendGroupMsgDic.Add(416554225, "健身健美交流群 测试1");
+
+            InitManagerGroups();
+        }
+
+        private void InitManagerGroups()
+        {
+            List<Group> groups = new List<Group>();
+            Common.CqApi.GetGroupList(out groups);
+            long myQQ = Common.CqApi.GetLoginQQ();
+            GroupMember groupMember;
+            foreach (Group item in groups)
+            {
+                groupMember = new GroupMember();
+                Common.CqApi.GetMemberInfo(item.Id, myQQ, out groupMember, true);
+                if (groupMember.PermitType != Sdk.Cqp.Enum.PermitType.None)
+                {
+                    //我是管理
+                    m_managerGroups.Add(item.Id);
+                }
+            }
+        }
+
+        public bool IsManager(long group)
+        {
+            return m_managerGroups.Contains(group);
         }
 
         /// <summary>
@@ -126,10 +140,10 @@ namespace Native.Csharp.App
         public void AddGroupSendMsg(long group,string msg,long fromQQ = defaultManagerQQ)
         {
             bool isExist = false;
-            List<Sdk.Cqp.Model.Group> groups = new List<Sdk.Cqp.Model.Group>();
+            List<Group> groups = new List<Group>();
             Common.CqApi.GetGroupList(out groups);
 
-            foreach (Sdk.Cqp.Model.Group item in groups)
+            foreach (Group item in groups)
             {
                 if(item.Id == group)
                 {
@@ -144,12 +158,12 @@ namespace Native.Csharp.App
                 return;
             }
 
-            if (m_sendGroupMsgDic.ContainsKey(group))
+            if (SendGroupMsgDic.ContainsKey(group))
             {
-                m_sendGroupMsgDic[group] = msg;
+                SendGroupMsgDic[group] = msg;
             }else
             {
-                m_sendGroupMsgDic.Add(group, msg);
+                SendGroupMsgDic.Add(group, msg);
             }
             QueryGroupSendMsg(fromQQ);
         }
@@ -161,16 +175,11 @@ namespace Native.Csharp.App
         /// <param name="fromQQ"></param>
         public void RemoveGroupSendMsg(long group, long fromQQ = defaultManagerQQ)
         {
-            foreach (var item in m_sendGroupMsgDic)
+            foreach (var item in SendGroupMsgDic)
             {
                 if (item.Key != group)
                     continue;
-                m_sendGroupMsgDic.Remove(item.Key);
-            }
-
-            for (int i = 0; i < m_sendGroupMsgDic.Count; i++)
-            {
-
+                SendGroupMsgDic.Remove(item.Key);
             }
 
             QueryGroupSendMsg(fromQQ);
@@ -185,7 +194,7 @@ namespace Native.Csharp.App
             StringBuilder strBuilder = new StringBuilder();
             int id = 0;
             strBuilder.Append("查询-发送群消息列表\r\n");
-            foreach (var item in m_sendGroupMsgDic)
+            foreach (var item in SendGroupMsgDic)
             {
                 strBuilder.Append(id+1);
                 strBuilder.Append("  ");

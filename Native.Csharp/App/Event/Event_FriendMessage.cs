@@ -122,13 +122,8 @@ namespace Native.Csharp.App.Event
                 else if (e.Msg.Contains("设置计时器时间:"))
                 {
                     long time = 999;
-                    try
-                    {
-                        time = long.Parse(e.Msg.Split(':')[1]);
-                    }
-                    catch (Exception)
-                    {
-                    }
+                    time = long.Parse(e.Msg.Split(':')[1]);
+
                     if (time == 999)
                     {
                         handlFriendMessageResult.Append("设置发送时间失败，请检查格式【设置计时器时间:10000】英文分隔符");
@@ -208,15 +203,10 @@ namespace Native.Csharp.App.Event
                 else if (e.Msg.Contains("删除发送群"))
                 {
                     long group = 999;
-                    try
-                    {
-                        string splitStr = ":";
-                        group = long.Parse(e.Msg.Split(splitStr.ToCharArray())[1]);
-                    }
-                    catch
-                    {
 
-                    }
+                    string splitStr = ":";
+                    group = long.Parse(e.Msg.Split(splitStr.ToCharArray())[1]);
+
                     if (group == 999)
                     {
                         handlFriendMessageResult.Append("删除发送群失败，请检查格式【添加发送群:10000】英文分隔符");
@@ -280,10 +270,10 @@ namespace Native.Csharp.App.Event
         private List<long> canSendGroupList = new List<long>();
         private void StartSendGroupMsg(PrivateMessageEventArgs e)
         {
-            sendGroupMsg = new Thread(() => { Common.CqApi.SendPrivateMessage(e.FromQQ, "定时任务"); });
+            sendGroupMsg = new Thread(() => SendGroupMsg());
             sendGroupMsg.IsBackground = true;
             sendGroupMsg.Start();
-            Thread.Sleep(50000);
+            Thread.Sleep(Common.Config.SendGroupMsgDelay);
             StopSendGroupMsg();
             if (!isStop) { StartSendGroupMsg(e); return; }
             if (isStop)
@@ -291,6 +281,25 @@ namespace Native.Csharp.App.Event
                 Common.CqApi.SendPrivateMessage(e.FromQQ, "计时器已经结束");
             }
         }
+
+        private void SendGroupMsg()
+        {
+            Dictionary<long, string> groups = Common.Config.SendGroupMsgDic;
+
+            foreach (KeyValuePair<long,string> item in groups)
+            {
+                int result = Common.CqApi.SendGroupMessage(item.Key, item.Value);
+                if(result != 0)
+                {
+                    if(result == -34)
+                    {
+                        //发送失败-被禁言或者被踢了
+                        Common.Config.RemoveGroupSendMsg(item.Key);
+                    }
+                }
+            }
+        }
+
         private void StopSendGroupMsg()
         {
             sendGroupMsg.Abort();
