@@ -1,6 +1,10 @@
-﻿using System;
-using System.Data.SQLie;
-
+﻿using Native.Csharp.App.Model;
+using System;
+using System.Data;
+using System.Data.SQLite;
+using System.IO;
+using System.Text.RegularExpressions;
+using System.Xml;
 
 namespace Native.Csharp.App
 {
@@ -16,6 +20,26 @@ namespace Native.Csharp.App
         private SQLiteHelper()
         {
         }
+
+        public static int CreateDB(SqliteData.CreateDB data)
+        {
+            string path = Common.CqApi.GetAppDirectory();
+
+            Common.CqApi.AddLoger(Sdk.Cqp.Enum.LogerLevel.Info, "SqliteHelper.path", path);
+
+            path += "data source=" + data.dbName;
+
+            Common.CqApi.AddLoger(Sdk.Cqp.Enum.LogerLevel.Info, "SqliteHelper.path", path);
+            //if (!Directory.Exists(data.dbPath))
+            //{
+            //    Common.CqApi.AddLoger(Sdk.Cqp.Enum.LogerLevel.Info, "SqliteHelper.path", path);
+
+            //    //SQLiteConnection cn = new SQLiteConnection("data source=" + data.dbPath);
+            //    return 0;
+            //}
+            return -1;
+        }
+
         /// <summary>
         /// Creates the command.
         /// </summary>

@@ -79,6 +79,8 @@ namespace Native.Csharp.App.Core
 			// 酷Q获取应用信息后，如果接受该应用，将会调用这个函数并传递AuthCode。
 			Common.CqApi = new CqApi (authCode);
 
+            Common.Config = new Config();
+
 			// AuthCode 传递完毕后将对象加入容器托管, 以便在其它项目中调用
 			Common.UnityContainer.RegisterInstance<CqApi> (Common.CqApi);
 
