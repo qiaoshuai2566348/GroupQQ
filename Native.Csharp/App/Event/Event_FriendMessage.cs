@@ -42,7 +42,6 @@ namespace Native.Csharp.App.Event
             Common.CqApi.SetFriendAddRequest("机器人添加", Sdk.Cqp.Enum.ResponseType.PASS, "机器人添加");
             e.Handled = true;
             return;
-			e.Handled = false;   // 关于返回说明, 请参见 "Event_ReceiveMessage.ReceiveFriendMessage" 方法
 		}
 
         private StringBuilder handlFriendMessageResult = new StringBuilder();
