@@ -1,10 +1,4 @@
-﻿
-
-
-
-
-
-/*
+﻿/*
  *	此代码由模板生成, 请勿随意修改此源代码, 防止出现错误
  *	需要更新 AppID 请右击模板文件, 点击运行自定义工具
  */
@@ -78,8 +72,6 @@ namespace Native.Csharp.App.Core
 		{
 			// 酷Q获取应用信息后，如果接受该应用，将会调用这个函数并传递AuthCode。
 			Common.CqApi = new CqApi (authCode);
-
-            Common.Config = new Config();
 
 			// AuthCode 传递完毕后将对象加入容器托管, 以便在其它项目中调用
 			Common.UnityContainer.RegisterInstance<CqApi> (Common.CqApi);

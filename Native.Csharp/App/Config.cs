@@ -12,14 +12,25 @@ namespace Native.Csharp.App
     /// </summary>
     public class Config
     {
-
         #region 私有变量
-        private List<long> m_canSendGroup = new List<long>();
-        private List<long> m_managersQQ = new List<long>();
-        private int m_sendGroupMsgDelay = 5000;
-        private string m_sendGroupMsgContent = "群消息定时发送测试";
 
-        private const long defaultManagerQQ = 735487435;
+        /// <summary>
+        /// 可以在群里发消息的群列表
+        /// </summary>
+        private List<long> m_canSendGroup = new List<long>();
+
+        /// <summary>
+        /// 不能私聊的群
+        /// </summary>
+        private List<long> m_cannotSendPrivateGroup = new List<long>();
+        /// <summary>
+        /// QQ机器人管理员
+        /// </summary>
+        private List<long> m_managersQQ = new List<long>();
+        /// <summary>
+        /// 群里发送消息间隔时间
+        /// </summary>
+        private int m_sendGroupMsgDelay = 5000;
 
         /// <summary>
         /// 已经发送私聊的QQ
@@ -30,7 +41,14 @@ namespace Native.Csharp.App
         /// 给群制定消息，不同的群发送不同的消息
         /// </summary>
         private Dictionary<long, string> m_sendGroupMsgDic = new Dictionary<long, string>();
+        /// <summary>
+        /// 给群指定私聊成员消息，不同的群私聊的消息不一样
+        /// </summary>
+        private Dictionary<long, string> m_sendGroupPrivateMsgDic = new Dictionary<long, string>();
 
+        /// <summary>
+        /// QQ机器人最高权限管理员列表，可以有多个
+        /// </summary>
         private List<long> m_managerGroups = new List<long>();
 
         public List<long> CanSendGroup
@@ -72,19 +90,6 @@ namespace Native.Csharp.App
             }
         }
 
-        public string SendGroupMsgContent
-        {
-            get
-            {
-                return m_sendGroupMsgContent;
-            }
-
-            set
-            {
-                m_sendGroupMsgContent = value;
-            }
-        }
-
         public Dictionary<long, List<long>> AlreadySendQQ
         {
             get { return m_alreadySendQQ; }
@@ -95,6 +100,29 @@ namespace Native.Csharp.App
         {
             get { return m_sendGroupMsgDic; }
             set { m_sendGroupMsgDic = value; }
+        }
+
+        public List<long> CannotSendPrivateGroup {
+            get {
+                return m_cannotSendPrivateGroup;
+            }
+
+            set {
+                m_cannotSendPrivateGroup = value;
+            }
+        }
+
+        /// <summary>
+        /// 给群指定私聊成员消息，不同的群私聊的消息不一样
+        /// </summary>
+        public Dictionary<long, string> SendGroupPrivateMsgDic {
+            get {
+                return m_sendGroupPrivateMsgDic;
+            }
+
+            set {
+                m_sendGroupPrivateMsgDic = value;
+            }
         }
 
         #endregion
@@ -137,7 +165,7 @@ namespace Native.Csharp.App
         /// <param name="group"></param>
         /// <param name="msg"></param>
         /// <param name="fromQQ"></param>
-        public void AddGroupSendMsg(long group,string msg,long fromQQ = defaultManagerQQ)
+        public void AddGroupSendMsg(long group,string msg,long fromQQ)
         {
             bool isExist = false;
             List<Group> groups = new List<Group>();
@@ -173,7 +201,7 @@ namespace Native.Csharp.App
         /// </summary>
         /// <param name="group"></param>
         /// <param name="fromQQ"></param>
-        public void RemoveGroupSendMsg(long group, long fromQQ = defaultManagerQQ)
+        public void RemoveGroupSendMsg(long group, long fromQQ)
         {
             foreach (var item in SendGroupMsgDic)
             {
@@ -189,7 +217,7 @@ namespace Native.Csharp.App
         /// 查询-发送群消息列表
         /// </summary>
         /// <param name="fromQQ"></param>
-        public void QueryGroupSendMsg(long fromQQ = defaultManagerQQ)
+        public void QueryGroupSendMsg(long fromQQ)
         {
             StringBuilder strBuilder = new StringBuilder();
             int id = 0;

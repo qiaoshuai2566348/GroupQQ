@@ -33,17 +33,18 @@ namespace Native.Csharp.Sdk.Cqp
 		public CqApi (int authCode)
 		{
 			this._authCode = authCode;
-		}
-		#endregion
 
-		#region --CQ码--
-		/// <summary>
-		/// 获取酷Q "At某人" 代码
-		/// </summary>
-		/// <param name="qqId">QQ号, 填写 -1 为At全体成员</param>
-		/// <param name="addSpacing">默认为True, At后添加空格, 可使At更规范美观. 如果不需要添加空格, 请置本参数为False</param>
-		/// <returns></returns>
-		public string CqCode_At (long qqId = -1, bool addSpacing = true)
+        }
+        #endregion
+
+        #region --CQ码--
+        /// <summary>
+        /// 获取酷Q "At某人" 代码
+        /// </summary>
+        /// <param name="qqId">QQ号, 填写 -1 为At全体成员</param>
+        /// <param name="addSpacing">默认为True, At后添加空格, 可使At更规范美观. 如果不需要添加空格, 请置本参数为False</param>
+        /// <returns></returns>
+        public string CqCode_At (long qqId = -1, bool addSpacing = true)
 		{
 			return string.Format ("[CQ:at,qq={0}]{1}", (qqId == -1) ? "all" : qqId.ToString (), addSpacing ? " " : string.Empty);
 		}

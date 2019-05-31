@@ -98,31 +98,22 @@ namespace Native.Csharp.App.Event
             {
                 if ((e.Msg == "指令" || e.Msg == "help" ) && Common.Config.ManagersQQ.Contains(e.FromQQ))
                 {
-                    PrintCommond(e);
+                    //PrintCommond(e);
                     return;
                 }
-                if (e.Msg == "开启计时器")
+                if (e.Msg == "开始发送")
                 {
                     isStop = false;
                     StartSendGroupMsg(e);
                 }
-                else if (e.Msg == "结束计时器")
+                else if (e.Msg == "结束发送")
                 {
                     isStop = true;
                 }
-                else if (e.Msg.Contains("设置群发消息"))
-                {
-                    string splitStr = ":";
-                    Common.Config.SendGroupMsgContent = e.Msg.Split(splitStr.ToCharArray())[0];
-                    handlFriendMessageResult.Append("设置群发消息成功，当前群发消息为【");
-                    handlFriendMessageResult.Append(Common.Config.SendGroupMsgContent);
-                    handlFriendMessageResult.Append("】");
-                }
-
                 else if (e.Msg.Contains("设置计时器时间:"))
                 {
-                    long time = 999;
-                    time = long.Parse(e.Msg.Split(':')[1]);
+                    int time = 999;
+                    time = int.Parse(e.Msg.Split(':')[1]);
 
                     if (time == 999)
                     {
@@ -137,22 +128,22 @@ namespace Native.Csharp.App.Event
                 }
                 else if (e.Msg == "获取群列表")
                 {
-                    int id = 0;
-                    List<Sdk.Cqp.Model.Group> groupList = new List<Sdk.Cqp.Model.Group>();
-                    Common.CqApi.GetGroupList(out groupList);
-                    if (groupList.Count > 0)
-                    {
-                        foreach (var item in groupList)
-                        {
-                            id++;
-                            handlFriendMessageResult.Append(id);
-                            handlFriendMessageResult.Append(":群号：");
-                            handlFriendMessageResult.Append(item.Id);
-                            handlFriendMessageResult.Append(":群名称：");
-                            handlFriendMessageResult.Append(item.Name);
-                            handlFriendMessageResult.Append("\r\n");
-                        }
-                    }
+                    //int id = 0;
+                    //List<Sdk.Cqp.Model.Group> groupList = new List<Sdk.Cqp.Model.Group>();
+                    //Common.CqApi.GetGroupList(out groupList);
+                    //if (groupList.Count > 0)
+                    //{
+                    //    foreach (var item in groupList)
+                    //    {
+                    //        id++;
+                    //        handlFriendMessageResult.Append(id);
+                    //        handlFriendMessageResult.Append(":群号：");
+                    //        handlFriendMessageResult.Append(item.Id);
+                    //        handlFriendMessageResult.Append(":群名称：");
+                    //        handlFriendMessageResult.Append(item.Name);
+                    //        handlFriendMessageResult.Append("\r\n");
+                    //    }
+                    //}
                 }
                 else if (e.Msg.Contains("获取群成员"))
                 {
@@ -179,50 +170,6 @@ namespace Native.Csharp.App.Event
                         return;
                     }
                 }
-                else if (e.Msg.Contains("添加发送群"))
-                {
-                    long group = 999;
-                    try
-                    {
-                        group = long.Parse(e.Msg.Split(':')[1]);
-                    }
-                    catch
-                    {
-                    }
-                    if (group == 999)
-                    {
-                        handlFriendMessageResult.Append("添加发送群失败，请检查格式【添加发送群:10000】英文分隔符");
-                    }
-                    else
-                    {
-                        InsertCanSendGroup(e, group);
-                        return;
-
-                    }
-                }
-                else if (e.Msg.Contains("删除发送群"))
-                {
-                    long group = 999;
-
-                    string splitStr = ":";
-                    group = long.Parse(e.Msg.Split(splitStr.ToCharArray())[1]);
-
-                    if (group == 999)
-                    {
-                        handlFriendMessageResult.Append("删除发送群失败，请检查格式【添加发送群:10000】英文分隔符");
-                    }
-                    else
-                    {
-                        RemoveCanSendGroup(e, group);
-                        return;
-
-                    }
-                }
-                else if (e.Msg.Contains("查询发送群") || e.Msg == "6")
-                {
-                    PrintCanSendGroup(e);
-                    return;
-                }
                 else if (e.Msg == "createdb")
                 {
                     CreateDB db = new CreateDB();
@@ -231,7 +178,7 @@ namespace Native.Csharp.App.Event
 
                     SQLiteHelper.CreateDB(db);
                 }
-                else if (e.Msg.Contains("AddGroupSendMsg"))
+                else if (e.Msg.Contains("添加群发送"))
                 {
                     //AddGroupSendMsg:123456:发送测试
                     string[] strArray = e.Msg.Split(':');
@@ -240,7 +187,7 @@ namespace Native.Csharp.App.Event
                     Common.Config.AddGroupSendMsg(group, msg, e.FromQQ);
                     return;
                 }
-                else if (e.Msg.Contains("RemoveSendMsg"))
+                else if (e.Msg.Contains("删除群发送"))
                 {
                     //RemoveGroupSendMsg:123456:发送测试
                     string[] strArray = e.Msg.Split(':');
@@ -248,9 +195,9 @@ namespace Native.Csharp.App.Event
                     Common.Config.RemoveGroupSendMsg(group, e.FromQQ);
                     return;
                 }
-                else if (e.Msg.Contains("QueryGroupSendMsg"))
+                else if (e.Msg.Contains("查询当前群发送") || e.Msg == "7")
                 {
-                    Common.Config.QueryGroupSendMsg();
+                    Common.Config.QueryGroupSendMsg(e.FromQQ);
                 }
 
                 if (handlFriendMessageResult.Length <= 0)
@@ -267,10 +214,9 @@ namespace Native.Csharp.App.Event
 
         private Thread sendGroupMsg;
         private bool isStop = false;
-        private List<long> canSendGroupList = new List<long>();
         private void StartSendGroupMsg(PrivateMessageEventArgs e)
         {
-            sendGroupMsg = new Thread(() => SendGroupMsg());
+            sendGroupMsg = new Thread(() => SendGroupMsg(e.FromQQ));
             sendGroupMsg.IsBackground = true;
             sendGroupMsg.Start();
             Thread.Sleep(Common.Config.SendGroupMsgDelay);
@@ -282,21 +228,23 @@ namespace Native.Csharp.App.Event
             }
         }
 
-        private void SendGroupMsg()
+        private void SendGroupMsg(long fromQQ)
         {
             Dictionary<long, string> groups = Common.Config.SendGroupMsgDic;
 
             foreach (KeyValuePair<long,string> item in groups)
             {
-                int result = Common.CqApi.SendGroupMessage(item.Key, item.Value);
-                if(result != 0)
-                {
-                    if(result == -34)
-                    {
-                        //发送失败-被禁言或者被踢了
-                        Common.Config.RemoveGroupSendMsg(item.Key);
-                    }
-                }
+                Common.CqApi.AddLoger(Sdk.Cqp.Enum.LogerLevel.Info,"循环发送","循环发送测试");
+                //int result = Common.CqApi.SendGroupMessage(item.Key, item.Value);
+                //if(result != 0)
+                //{
+                //    if(result == -34)
+                //    {
+                //        //发送失败-被禁言或者被踢了
+                //        Common.Config.RemoveGroupSendMsg(item.Key, fromQQ);
+                //        Common.CqApi.SendPrivateMessage(fromQQ, item.Key + "  群发消息的时候，被禁言或者被踢了");
+                //    }
+                //}
             }
         }
 
@@ -305,78 +253,22 @@ namespace Native.Csharp.App.Event
             sendGroupMsg.Abort();
         }
 
-        private void InsertCanSendGroup(PrivateMessageEventArgs e,long group)
-        {
-            StringBuilder result = new StringBuilder();
-            if (canSendGroupList.Contains(group))
-            {
-                result.Append("您已添加【");
-                result.Append(group);
-                result.Append("】请不要重复添加");
-                Common.CqApi.SendPrivateMessage(e.FromQQ, result.ToString());
-                return;
-            }
-            if (canSendGroupList == null)
-            {
-                canSendGroupList = new List<long>();
-            }
-            canSendGroupList.Add(group);
-            if (canSendGroupList.Contains(group))
-            {
-                result.Append("添加成功");
-                PrintCanSendGroup(e);
-            }
-            else
-            {
-                result.Append("添加发送群失败，请检查格式【添加发送群:10000】英文分隔符");
-            }
-            Common.CqApi.SendPrivateMessage(e.FromQQ, result.ToString());
-        }
-        private void RemoveCanSendGroup(PrivateMessageEventArgs e,long group)
-        {
-            foreach (var item in canSendGroupList)
-            {
-                if (item == group)
-                {
-                    canSendGroupList.Remove(group);
-                    break;
-                }
-            }
-            PrintCanSendGroup(e);
-            Common.CqApi.SendPrivateMessage(e.FromQQ, "删除发送群成功");
-        }
-        private void PrintCanSendGroup(PrivateMessageEventArgs e)
-        {
-            StringBuilder result = new StringBuilder();
-            result.Append("当前群列表  ");
-            result.Append(canSendGroupList.Count());
-            foreach (var item in canSendGroupList)
-            {
-                result.Append("\r\n【");
-                result.Append(item);
-                result.Append("】");
-            }
-            Common.CqApi.SendPrivateMessage(e.FromQQ, result.ToString());
-        }
 
         private void PrintCommond(PrivateMessageEventArgs e)
         {
             StringBuilder command = new StringBuilder();
-            command.Append("【指令，打印指令列表】【1】\r\n");
-            command.Append("【开始计时器】【2】\r\n");
-            command.Append("【结束计时器】【3】\r\n");
-            command.Append("【添加发送群:123456（英文分隔符）】【4】\r\n");
-            command.Append("【删除发送群:123456（英文分隔符）】【5】\r\n");
-            command.Append("【查询发送群】【6】\r\n");
-            command.Append("【】【8】\r\n");
-            command.Append("【】【9】\r\n");
-            command.Append("【】【10】\r\n");
-            command.Append("【】【11】\r\n");
-            command.Append("【】【12】\r\n");
-            command.Append("【】【13】\r\n");
-            command.Append("【】【14】\r\n");
-            command.Append("【】【15】\r\n");
-            command.Append("【】【16】\r\n");
+            command.Append("【指令，打印指令列表，注：以下冒号为英文符合，非中文】【1】\r\n");
+
+            command.Append("【开始发送】【2】\r\n");
+            command.Append("【结束发送】【3】\r\n");
+            command.Append("【设置计时器时间:时间，注：单位秒，600为1分钟】");
+
+            //command.Append("【获取群成员】\r\n");
+            command.Append("【获取群列表】\r\n");
+            command.Append("【添加群发送:群号（英文分隔符）】【4】\r\n");
+            command.Append("【删除群发送:群号（英文分隔符）】【5】\r\n");
+            command.Append("【查询当前群发送】【6】\r\n");
+            //command.Append("【createdb】\r\n");
             Common.CqApi.SendPrivateMessage(e.FromQQ, command.ToString());
         }
         #endregion

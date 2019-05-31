@@ -39,11 +39,31 @@ namespace Native.Csharp.App.Event
             GroupMember member = new GroupMember();
             Common.CqApi.GetMemberInfo(e.FromGroup, e.FromQQ, out member);
 
-             if(member.PermitType != Sdk.Cqp.Enum.PermitType.None)
+            switch (member.PermitType)
             {
+                case Sdk.Cqp.Enum.PermitType.None:
+                    if (Common.Config.CannotSendPrivateGroup.Contains(e.FromGroup))
+                    {
+                        e.Handled = false;
+                        return;
+                    }
+                    int sendResult = Common.CqApi.SendPrivateMessage(e.FromQQ, Common.Config.SendGroupPrivateMsgDic[e.FromGroup]);
 
-                return;
+                    if(sendResult != 0)
+                    {
+                        Common.CqApi.SendPrivateMessage(Common.Config.ManagersQQ[0], e.FromGroup + "此群不能私聊，移除");
+                        Common.Config.CannotSendPrivateGroup.Add(e.FromGroup);
+                    }
+
+                    break;
+                case Sdk.Cqp.Enum.PermitType.Manage:
+                case Sdk.Cqp.Enum.PermitType.Holder:
+
+                    break;
+                default:
+                    break;
             }
+
 
             // 与2019年02月26日, 默认注释此行代码.
             //Common.CqApi.SendGroupMessage (e.FromGroup, Common.CqApi.CqCode_At (e.FromQQ) + "你发送了这样的消息: " + e.Msg);
