@@ -42,7 +42,6 @@ namespace Native.Csharp.App.Event
             Common.CqApi.SetFriendAddRequest("机器人添加", Sdk.Cqp.Enum.ResponseType.PASS, "机器人添加");
             e.Handled = true;
             return;
-			e.Handled = false;   // 关于返回说明, 请参见 "Event_ReceiveMessage.ReceiveFriendMessage" 方法
 		}
 
         private StringBuilder handlFriendMessageResult = new StringBuilder();
@@ -121,8 +120,8 @@ namespace Native.Csharp.App.Event
 
                 else if (e.Msg.Contains("设置计时器时间:"))
                 {
-                    long time = 999;
-                    time = long.Parse(e.Msg.Split(':')[1]);
+                    int time = 999;
+                    time = int.Parse(e.Msg.Split(':')[1]);
 
                     if (time == 999)
                     {
