@@ -8,7 +8,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Native.Csharp</RootNamespace>
-    <AssemblyName>com.xm.robot</AssemblyName>
+    <AssemblyName>app</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -130,7 +130,7 @@
     <Compile Include="App\SQLiteHelper.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="com.xm.robot.json">
+    <None Include="app.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="packages.config" />

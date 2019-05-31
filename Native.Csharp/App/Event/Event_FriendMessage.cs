@@ -97,7 +97,7 @@ namespace Native.Csharp.App.Event
             {
                 if ((e.Msg == "指令" || e.Msg == "help" ) && Common.Config.ManagersQQ.Contains(e.FromQQ))
                 {
-                    //PrintCommond(e);
+                    PrintCommond(e);
                     return;
                 }
                 if (e.Msg == "开始发送")
@@ -127,22 +127,22 @@ namespace Native.Csharp.App.Event
                 }
                 else if (e.Msg == "获取群列表")
                 {
-                    //int id = 0;
-                    //List<Sdk.Cqp.Model.Group> groupList = new List<Sdk.Cqp.Model.Group>();
-                    //Common.CqApi.GetGroupList(out groupList);
-                    //if (groupList.Count > 0)
-                    //{
-                    //    foreach (var item in groupList)
-                    //    {
-                    //        id++;
-                    //        handlFriendMessageResult.Append(id);
-                    //        handlFriendMessageResult.Append(":群号：");
-                    //        handlFriendMessageResult.Append(item.Id);
-                    //        handlFriendMessageResult.Append(":群名称：");
-                    //        handlFriendMessageResult.Append(item.Name);
-                    //        handlFriendMessageResult.Append("\r\n");
-                    //    }
-                    //}
+                    int id = 0;
+                    List<Sdk.Cqp.Model.Group> groupList = new List<Sdk.Cqp.Model.Group>();
+                    Common.CqApi.GetGroupList(out groupList);
+                    if (groupList.Count > 0)
+                    {
+                        foreach (var item in groupList)
+                        {
+                            id++;
+                            handlFriendMessageResult.Append(id);
+                            handlFriendMessageResult.Append(":群号：");
+                            handlFriendMessageResult.Append(item.Id);
+                            handlFriendMessageResult.Append(":群名称：");
+                            handlFriendMessageResult.Append(item.Name);
+                            handlFriendMessageResult.Append("\r\n");
+                        }
+                    }
                 }
                 else if (e.Msg.Contains("获取群成员"))
                 {
@@ -234,16 +234,16 @@ namespace Native.Csharp.App.Event
             foreach (KeyValuePair<long,string> item in groups)
             {
                 Common.CqApi.AddLoger(Sdk.Cqp.Enum.LogerLevel.Info,"循环发送","循环发送测试");
-                //int result = Common.CqApi.SendGroupMessage(item.Key, item.Value);
-                //if(result != 0)
-                //{
-                //    if(result == -34)
-                //    {
-                //        //发送失败-被禁言或者被踢了
-                //        Common.Config.RemoveGroupSendMsg(item.Key, fromQQ);
-                //        Common.CqApi.SendPrivateMessage(fromQQ, item.Key + "  群发消息的时候，被禁言或者被踢了");
-                //    }
-                //}
+                int result = Common.CqApi.SendGroupMessage(item.Key, item.Value);
+                if (result != 0)
+                {
+                    if (result == -34)
+                    {
+                        //发送失败-被禁言或者被踢了
+                        Common.Config.RemoveGroupSendMsg(item.Key, fromQQ);
+                        Common.CqApi.SendPrivateMessage(fromQQ, item.Key + "  群发消息的时候，被禁言或者被踢了");
+                    }
+                }
             }
         }
 
