@@ -102,25 +102,32 @@ namespace Native.Csharp.App.Event
                 }
                 if (e.Msg == "开始发送")
                 {
+                    if (isSending)
+                    {
+                        Common.CqApi.SendPrivateMessage(e.FromQQ, "正在发送，请勿多次指令");
+                        return;
+                    }
+                    isSending = true;
                     isStop = false;
                     StartSendGroupMsg(e);
                 }
                 else if (e.Msg == "结束发送")
                 {
                     isStop = true;
+                    Common.CqApi.SendPrivateMessage(e.FromQQ, "结束发送 指令已收到，当前轮发送完即可自动停止");
                 }
-                else if (e.Msg.Contains("设置计时器时间:"))
+                else if (e.Msg.Contains("设置发送时间:"))
                 {
                     int time = 999;
                     time = int.Parse(e.Msg.Split(':')[1]);
 
                     if (time == 999)
                     {
-                        handlFriendMessageResult.Append("设置发送时间失败，请检查格式【设置计时器时间:10000】英文分隔符");
+                        handlFriendMessageResult.Append("设置发送时间失败，请检查格式【设置计时器时间:1（分钟）】英文分隔符");
                     }
                     else
                     {
-                        Common.Config.SendGroupMsgDelay = time;
+                        Common.Config.SendGroupMsgDelay = time * 1000;//秒转换为毫秒TODU：测试时候为妙，运营后改为分钟
                         handlFriendMessageResult.Append("设置发送时间成功，当前时间为");
                         handlFriendMessageResult.Append(Common.Config.SendGroupMsgDelay);
                     }
@@ -212,7 +219,14 @@ namespace Native.Csharp.App.Event
         }
 
         private Thread sendGroupMsg;
+        /// <summary>
+        /// 发送线程将要停止
+        /// </summary>
         private bool isStop = false;
+        /// <summary>
+        /// 正在执行发送线程
+        /// </summary>
+        private bool isSending = false;
         private void StartSendGroupMsg(PrivateMessageEventArgs e)
         {
             sendGroupMsg = new Thread(() => SendGroupMsg(e.FromQQ));
@@ -223,6 +237,7 @@ namespace Native.Csharp.App.Event
             if (!isStop) { StartSendGroupMsg(e); return; }
             if (isStop)
             {
+                isSending = false;
                 Common.CqApi.SendPrivateMessage(e.FromQQ, "计时器已经结束");
             }
         }
@@ -233,7 +248,7 @@ namespace Native.Csharp.App.Event
 
             foreach (KeyValuePair<long,string> item in groups)
             {
-                Common.CqApi.AddLoger(Sdk.Cqp.Enum.LogerLevel.Info,"循环发送","循环发送测试");
+                //Common.CqApi.AddLoger(Sdk.Cqp.Enum.LogerLevel.Info,"循环发送","循环发送测试");
                 int result = Common.CqApi.SendGroupMessage(item.Key, item.Value);
                 if (result != 0)
                 {
@@ -260,7 +275,7 @@ namespace Native.Csharp.App.Event
 
             command.Append("【开始发送】【2】\r\n");
             command.Append("【结束发送】【3】\r\n");
-            command.Append("【设置计时器时间:时间，注：单位秒，600为1分钟】");
+            command.Append("【设置发送时间:时间，注：单位秒，600为1分钟】");
 
             //command.Append("【获取群成员】\r\n");
             command.Append("【获取群列表】\r\n");
